@@ -16,7 +16,11 @@ indentLevel = 0
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
 \usepackage[letterpaper,margin=1in]{geometry}\n\
-\pagestyle{empty}\n\
+\usepackage{fancyhdr}\n\
+\\renewcommand{\headrulewidth}{0pt}\n\
+\cfoot{}\n\
+\\rfoot{\\thepage}\n\
+\pagestyle{fancy}\n\
 \\begin{document}\n"
 
 destination.write(preamble)
