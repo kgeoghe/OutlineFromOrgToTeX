@@ -58,3 +58,5 @@ destination.write("\end{outline}\n\end{document}")
 
 target.close()
 destination.close()
+
+print "Conversion completed successfully."
