@@ -30,7 +30,7 @@ inputFile=$1
 outputFile=${inputFile//org/tex}
 echo 'Input file:' ${1}
 
-python outlineConvert.py $1
+python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $1
 
 echo 'Escaping special TeX characters...'
 
