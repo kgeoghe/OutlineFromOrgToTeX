@@ -47,6 +47,7 @@ cp text.out $outputFile
 rm text.out
 
 echo "Generated '"$outputFile"'\n"
-latexmk -c $outputFile
+latexmk -quiet $outputFile
+latexmk -c
 
 echo '\nPDF version of outline successfully generated!'
