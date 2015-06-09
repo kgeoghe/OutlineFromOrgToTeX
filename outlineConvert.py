@@ -74,9 +74,11 @@ try:
                 output += indentation + "\item " + " ".join(words[1:]) + "\n"
 
             bulletIndentLevel = 0  # not in bullet list, so reset bullet indent. level
+            lastLineFirstChar = firstString[0]
+            headlineIndentLast = headlineIndent
 
         # case for bulleted lists lines
-        else:
+        elif firstString[0] == '-':
             leadingSpaces = len(line) - len(line.lstrip(' '))  # leading spaces in org file line
             leadingTabs = (leadingSpaces / 2)                   # convert spaces into num. of  tabs
             bulletIndentation = "\t" * bulletIndentLevel
@@ -97,11 +99,13 @@ try:
                 output += indentation + bulletIndentation + "\item " + " ".join(words[1:]) + "\n"
 
             leadingTabsOld = leadingTabs
+            lastLineFirstChar = firstString[0]
 
+        # case for any text other than that beginning with a '*' or '-'
+        else:
+            output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
+            
         destination.write(output)
-
-        lastLineFirstChar = firstString[0]
-        headlineIndentLast = headlineIndent
     
     destination.write("\end{outline}\n\end{document}")
 
