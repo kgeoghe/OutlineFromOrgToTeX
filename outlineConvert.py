@@ -94,7 +94,7 @@ try:
                     bulletIndentation = "\t" * bulletIndentLevel
                     output += indentation + bulletIndentation + "\end{itemize}\n"
                     bulletIndentDiff -= 1
-                output += indentation + bulletindentation + "\item " + " ".join(words[1:]) + "\n"
+                output += indentation + bulletIndentation + "\item " + " ".join(words[1:]) + "\n"
 
             leadingTabsOld = leadingTabs
 
