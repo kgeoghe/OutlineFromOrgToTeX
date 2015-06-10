@@ -13,7 +13,9 @@ target = open(filename)
 
 ### For Testing ####
 # try:
-#     for line in target:
+#     # for line in target:
+#     #     print line
+#     for line in target.readlines()[2:]:
 #         print line
 #     print 'Contents of file %r' % filename + ' are printed above.'
 # finally:
@@ -30,8 +32,11 @@ bulletIndentLevel = 0
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
 \usepackage[letterpaper,margin=1in]{geometry}\n\
+\usepackage[mmddyy]{datetime}\n\
+\\renewcommand{\dateseparator}{--}\n\
 \usepackage{fancyhdr}\n\
 \\renewcommand{\headrulewidth}{0pt}\n\
+\lfoot{Rev. \\today}\n\
 \cfoot{}\n\
 \\rfoot{\\thepage}\n\
 \pagestyle{fancy}\n\
@@ -40,7 +45,8 @@ preamble = "\documentclass{report}\n\
 try:
     destination.write(preamble)
 
-    for line in target:
+    # skip first two lines where Org Mode file specifications exist
+    for line in target.readlines()[3:]:
         output = ""
         words = line.split()
         firstString = words[0]
@@ -57,12 +63,15 @@ try:
                     output += indentation + bulletIndentation + "\end{itemize}\n"
                     leadingTabsOld -= 1
 
+            # moving deeper into outline
             if headlineIndent > headlineIndentLast:
                 output += indentation + "\\begin{outline}\n" + indentation + "\t\item " +\
                          " ".join(words[1:]) + "\n"
                 indentLevel += 1
+            # staying at same level in outline
             elif headlineIndent == headlineIndentLast:
                 output += indentation + "\item " + " ".join(words[1:]) + "\n"
+            # moving to higher outline levels
             else:
                 indentDiff = headlineIndentLast - headlineIndent
                 while indentDiff / 2 > 0: # int division by two--only use odd number of asterisks in
@@ -101,7 +110,11 @@ try:
             leadingTabsOld = leadingTabs
             lastLineFirstChar = firstString[0]
 
-        # case for any text other than that beginning with a '*' or '-'
+        # leading backslashes cause text to be flush left
+        elif firstString[0] == '\\':
+            output = "\\\\" + " ".join(words) + "\n"
+
+        # case for any text other than that beginning with a '*', '-', or '\'
         else:
             output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
             
