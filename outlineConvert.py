@@ -23,6 +23,7 @@ target = open(filename)
 # quit()
 ################
 
+indentation = ""
 headlineIndentLast = 0
 indentLevel = 0
 leadingTabsOld = 0
@@ -45,16 +46,20 @@ preamble = "\documentclass{report}\n\
 try:
     destination.write(preamble)
 
-    # skip first two lines where Org Mode file specifications exist
-    for line in target.readlines()[3:]:
+    for line in target:
         output = ""
+        if line == '\n':  # skip empty lines
+            continue
         words = line.split()
         firstString = words[0]
 
+        # skip org file-specific settings
+        if firstString[0:3] == '-*-' or firstString[0:2] == '#+':
+            continue
+
         # case for org headlines (asterisks) lines
-        if firstString[0] == '*':
+        elif firstString[0] == '*':
             headlineIndent = len(firstString)
-            indentation = "\t" * indentLevel
 
             # first, take care of end itemize if last line started with a "-"
             if lastLineFirstChar == "-":
@@ -82,6 +87,7 @@ try:
                     indentDiff -= 2
                 output += indentation + "\item " + " ".join(words[1:]) + "\n"
 
+            indentation = "\t" * indentLevel
             bulletIndentLevel = 0  # not in bullet list, so reset bullet indent. level
             lastLineFirstChar = firstString[0]
             headlineIndentLast = headlineIndent
@@ -91,8 +97,8 @@ try:
             leadingSpaces = len(line) - len(line.lstrip(' '))  # leading spaces in org file line
             leadingTabs = (leadingSpaces / 2)                   # convert spaces into num. of  tabs
             bulletIndentation = "\t" * bulletIndentLevel
-            
-            if lastLineFirstChar == '*' or leadingTabs > leadingTabsOld:
+
+            if lastLineFirstChar == '*' or leadingTabs > leadingTabsOld or lastLineFirstChar == "":
                 output = indentation + bulletIndentation + "\\begin{itemize}\n" + indentation +\
                          bulletIndentation + "\t\item " + " ".join(words[1:]) + "\n"
                 bulletIndentLevel += 1
@@ -117,13 +123,26 @@ try:
         # case for any text other than that beginning with a '*', '-', or '\'
         else:
             output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
-            
+
         destination.write(output)
-    
-    destination.write("\end{outline}\n\end{document}")
+
+    # \end any hanging outline or itemize
+    output = ""
+    while leadingTabsOld > -1:
+        bulletIndentation = "\t" * leadingTabsOld
+        output += indentation + bulletIndentation + "\end{itemize}\n"
+        leadingTabsOld -= 1
+    while headlineIndentLast > 0:
+        headlineIndentLast -= 1
+        indentation = "\t" * headlineIndentLast
+        output += indentation + "\end{outline}\n"
+
+    output += "\end{document}"
+    destination.write(output)
 
 finally:
     target.close()
     destination.close()
 
 print "Conversion completed successfully."
+
