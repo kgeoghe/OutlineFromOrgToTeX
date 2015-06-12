@@ -34,14 +34,14 @@ python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $1
 
 echo 'Escaping special TeX characters...'
 
-sed 's/&/\\&/g' $outputFile > text.out
-# Add more replace commands for other characters that need to be excaped in LaTeX
-# Example:
-# sed 's/{#1}/'$timeStart'/g
-# s/{#2}/'$timeEnd'/g
-# s/{#3}/'$storm'\/'$domain'\/'$intensity'\/'$fValue'/g
-# s/{#4}/multRun\/output/g
-# s/{#5}/'$fValue'/g' templateRCL.card > multRun/rdhm$fValue.card
+# TIP - regexp to find any character except x: [^x]
+sed 's/&/\\&/g
+s/\$/\\$/g
+s/>=/$&$/g
+s/\([^\$]\)>/\1$>$/g
+s/<=/$&$/g
+s/\([^\$]\)</\1$<$/g
+s/_/\\_/g' $outputFile > text.out
 
 cp text.out $outputFile
 rm text.out
