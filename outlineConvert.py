@@ -1,14 +1,22 @@
 from sys import argv
+import argparse
 
-script, filename = argv
+parser = argparse.ArgumentParser()
+parser.add_argument('filename', help='type the filename on which to operate')
+parser.add_argument('--margin', nargs='?', default='1',\
+                    help='uniform margin width, in inches, to use in final PDF document; default is 1')
+parser.add_argument('--unit', nargs='?', default='in',\
+                    help='margin width units; default is in (inches)')
+args = parser.parse_args()
 
-basename = filename[:-4]
+basename = args.filename[:-4]
 to_filename = basename + ".tex"
 
 destination = open(to_filename, 'w')
 
 print "Opening the file..."
-target = open(filename)
+print "Using %s %s margins..." % (args.margin,args.unit)
+target = open(args.filename)
 
 
 ### For Testing ####
@@ -42,7 +50,7 @@ preamble = "\documentclass{report}\n\
 \cfoot{}\n\
 \\rfoot{\\thepage}\n\
 \pagestyle{fancy}\n\
-\\begin{document}\n"
+\\begin{document}\n" % (args.margin,args.unit)
 
 try:
     destination.write(preamble)

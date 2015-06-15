@@ -26,11 +26,37 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
+while getopts ":m:u:h" opt; do
+    case $opt in
+        m)
+            margin="--margin $OPTARG" >&2
+            ;;
+        u)
+            unit="--unit $OPTARG" >&2
+            ;;
+        h)
+            python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py -h
+            exit 1
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
+done
+
+shift $(( OPTIND-1 ))
+
 inputFile=$1
 outputFile=${inputFile//org/tex}
-echo 'Input file:' ${1}
+echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${margin} ${unit} ${1}"'"
+#echo 'Input file:' ${1}
 
-python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $1
+python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $margin $unit $1
 
 echo 'Escaping special TeX characters...'
 
