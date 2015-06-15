@@ -144,5 +144,4 @@ finally:
     target.close()
     destination.close()
 
-print "Conversion completed successfully."
-
+print "Conversion to TeX syntax completed successfully."
