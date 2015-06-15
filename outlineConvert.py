@@ -29,10 +29,11 @@ indentLevel = 0
 leadingTabsOld = 0
 lastLineFirstChar = ""
 bulletIndentLevel = 0
+bulletIndentation = ""
 
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
-\usepackage[letterpaper,margin=1in]{geometry}\n\
+\usepackage[letterpaper,margin=%s%s]{geometry}\n\
 \usepackage[mmddyy]{datetime}\n\
 \\renewcommand{\dateseparator}{--}\n\
 \usepackage{fancyhdr}\n\
@@ -118,11 +119,16 @@ try:
 
         # leading backslashes cause text to be flush left
         elif firstString[0] == '\\':
-            output = "\\\\" + " ".join(words) + "\n"
+            if lastLineFirstChar == "":
+                output = " ".join(words) + "\n"
+            else: output = "\\\\" + " ".join(words) + "\n"
 
         # case for any text other than that beginning with a '*', '-', or '\'
         else:
-            output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
+            if lastLineFirstChar == "":
+                output = " ".join(words) + "\n"
+            else:
+                output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
 
         destination.write(output)
 
