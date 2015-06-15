@@ -5,7 +5,7 @@
 #
 # Author: Kevin Geoghegan
 # Creation Date: 8 June 2015
-# Last Updated: 8 June 2015
+# Last Updated: 15 June 2015
 #
 # DESCRIPTION:
 # This script is a wrapper that executes outlineConvert.py followed by running sed
