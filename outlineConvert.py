@@ -48,7 +48,7 @@ addToPreamble = ""
 linespace = ""
 if args.draft==True:
     addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n"
-    linespace = "\onehalfspacing\n"
+    linespace = "\doublespacing\n"
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
 \usepackage[letterpaper,margin=%s%s%s]{geometry}\n\
