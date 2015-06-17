@@ -3,9 +3,11 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('filename', help='type the filename on which to operate')
-parser.add_argument('--margin', nargs='?', default='1',\
+parser.add_argument('-d', '--draft', action='store_true', help='flag to produce printable \
+draft instead of outline')
+parser.add_argument('-m', '--margin', nargs='?', default='1',\
                     help='uniform margin width, in inches, to use in final PDF document; default is 1')
-parser.add_argument('--unit', nargs='?', default='in',\
+parser.add_argument('-u', '--unit', nargs='?', default='in',\
                     help='margin width units; default is in (inches)')
 args = parser.parse_args()
 
@@ -39,26 +41,51 @@ lastLineFirstChar = ""
 bulletIndentLevel = 0
 bulletIndentation = ""
 
+footSkip = ""
+if float(args.margin) <= 0.75:
+    footSkip = ",footskip=12pt"
+addToPreamble = ""
+linespace = ""
+if args.draft==True:
+    addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n"
+    linespace = "\onehalfspacing\n"
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
-\usepackage[letterpaper,margin=%s%s]{geometry}\n\
+\usepackage[letterpaper,margin=%s%s%s]{geometry}\n\
 \usepackage[mmddyy]{datetime}\n\
+\usepackage{setspace}\n\
+\usepackage{enumitem}\n\
 \\renewcommand{\dateseparator}{--}\n\
 \usepackage{fancyhdr}\n\
 \\renewcommand{\headrulewidth}{0pt}\n\
 \lfoot{Rev. \\today}\n\
 \cfoot{}\n\
 \\rfoot{\\thepage}\n\
-\pagestyle{fancy}\n\
-\\begin{document}\n" % (args.margin,args.unit)
+\pagestyle{fancy}\n%s\
+\\begin{document}\n\
+\\noindent\n\
+%s" % (args.margin,args.unit,footSkip,addToPreamble,linespace)
 
 try:
     destination.write(preamble)
 
     for line in target:
         output = ""
-        if line == '\n':  # skip empty lines
-            continue
+        if line == '\n':                                      # skip empty lines
+            if lastLineFirstChar == "":           # purely skip lines in file header
+                continue
+            else:                                              # retain line skips I have in source file
+                while leadingTabsOld > -1:  # escape out of all outline/itemize envs. if linebreak
+                    bulletIndentation = "\t" * leadingTabsOld
+                    output += indentation + bulletIndentation + "\end{itemize}\n"
+                    leadingTabsOld -= 1
+                while headlineIndentLast > 0:
+                    headlineIndentLast -= 1
+                    indentation = "\t" * headlineIndentLast
+                    output += indentation + "\end{outline}\n"
+                output += "\\vspace{1em}\n"
+                destination.write(output)
+                continue
         words = line.split()
         firstString = words[0]
 
@@ -158,4 +185,4 @@ finally:
     target.close()
     destination.close()
 
-print "Conversion to TeX syntax completed successfully."
+print "Conversion from Org Mode to TeX syntax completed successfully."

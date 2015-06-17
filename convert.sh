@@ -26,8 +26,11 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
-while getopts ":m:u:h" opt; do
+while getopts ":m:u:hd" opt; do
     case $opt in
+        d)
+            draft="--draft $OPTARG" >&2
+            ;;
         m)
             margin="--margin $OPTARG" >&2
             ;;
@@ -53,10 +56,11 @@ shift $(( OPTIND-1 ))
 
 inputFile=$1
 outputFile=${inputFile//org/tex}
-echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${margin} ${unit} ${1}"'"
+pdfFile=${inputFile//org/pdf}
+echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${draft} ${margin} ${unit} ${1}"'"
 #echo 'Input file:' ${1}
 
-python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $margin $unit $1
+python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $draft $margin $unit $1
 
 echo 'Escaping special TeX characters...'
 
@@ -67,7 +71,8 @@ s/>=/$&$/g
 s/\([^\$]\)>/\1$>$/g
 s/<=/$&$/g
 s/\([^\$]\)</\1$<$/g
-s/_/\\_/g' $outputFile > text.out
+s/_/\\_/g
+s/fig{\(.*\)}/fig\\{\1\\}/g' $outputFile > text.out
 
 cp text.out $outputFile
 rm text.out
@@ -76,4 +81,6 @@ echo "Generated '"$outputFile"'\n"
 latexmk -quiet $outputFile
 latexmk -c
 
-echo '\nPDF version of outline successfully generated!'
+
+
+echo "\n'"$pdfFile"' successfully generated!"
