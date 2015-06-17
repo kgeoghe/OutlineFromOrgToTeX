@@ -72,6 +72,7 @@ s/\([^\$]\)>/\1$>$/g
 s/<=/$&$/g
 s/\([^\$]\)</\1$<$/g
 s/_/\\_/g
+s/tab{\(.*\)}/tab\\{\1\\}/g
 s/fig{\(.*\)}/fig\\{\1\\}/g' $outputFile > text.out
 
 cp text.out $outputFile
