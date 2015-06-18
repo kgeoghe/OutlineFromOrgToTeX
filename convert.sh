@@ -66,13 +66,13 @@ echo 'Escaping special TeX characters...'
 
 # TIP - regexp to find any character except x: [^x]
 sed 's/&/\\&/g
-s/\$/\\$/g
+s/\([^group]\)\$/\1\\$/g
 s/>=/$&$/g
 s/\([^\$]\)>/\1$>$/g
 s/<=/$&$/g
 s/\([^\$]\)</\1$<$/g
 s/_/\\_/g
-s/\([^\\textsuperscript{]\)TK\([0-9]*\)/\1\\textsuperscript{TK\2}/g' $outputFile > text.out
+s/\([^\\tiny{]\)TK\([0-9]*\)/\1\\textsuperscript{\\tiny{TK\2}}/g' $outputFile > text.out
 
 cp text.out $outputFile
 rm text.out

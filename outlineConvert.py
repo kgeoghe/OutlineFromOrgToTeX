@@ -50,7 +50,7 @@ if float(args.margin) <= 0.75:
 addToPreamble = ""
 linespace = ""
 if args.draft==True:
-    addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n\setlist[enumerate]{noitemsep, topsep=0pt}\n"
+    addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n\setlist[enumerate]{noitemsep, topsep=0pt}\n\def\\textvcenter\n\t{\hbox \\bgroup$\everyvbox{\everyvbox{}%\n\t\\aftergroup$\\aftergroup\egroup}\\vcenter}\n"
     linespace = "\doublespacing\n"
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
@@ -163,10 +163,10 @@ try:
         elif re.match('TK\d+',firstString):
             if lastLineFirstTwoChars != 'TK':
                 output = "\\begin{enumerate}%s\n" % continueEnumerate +\
-                         "\t\item[\\textsuperscript{%s}\\textbar]{\small " % firstString + " ".join(words[1:]) +\
-                         "}\n"
+                         "\t\item[\\textvcenter{\hbox{\\tiny{%s}}}]{\small " % firstString +\
+                         " ".join(words[1:]) + "}\n"
             else:
-                output = "\t\item[\\textsuperscript{%s}\\textbar] {\small " % firstString +\
+                output = "\t\item[\\textvcenter{\hbox{\\tiny{%s}}}]{\small " % firstString +\
                          " ".join(words[1:]) + "}\n"
             continueEnumerate = "[resume]"
             
