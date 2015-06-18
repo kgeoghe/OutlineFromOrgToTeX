@@ -72,8 +72,7 @@ s/\([^\$]\)>/\1$>$/g
 s/<=/$&$/g
 s/\([^\$]\)</\1$<$/g
 s/_/\\_/g
-s/tab{\(.*\)}/tab\\{\1\\}/g
-s/fig{\(.*\)}/fig\\{\1\\}/g' $outputFile > text.out
+s/\([^\\textsuperscript{]\)TK\([0-9]*\)/\1\\textsuperscript{TK\2}/g' $outputFile > text.out
 
 cp text.out $outputFile
 rm text.out
@@ -81,7 +80,5 @@ rm text.out
 echo "Generated '"$outputFile"'\n"
 latexmk -quiet $outputFile
 latexmk -c
-
-
 
 echo "\n'"$pdfFile"' successfully generated!"

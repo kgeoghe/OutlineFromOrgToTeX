@@ -1,4 +1,5 @@
 from sys import argv
+import re
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -38,8 +39,10 @@ headlineIndentLast = 0
 indentLevel = 0
 leadingTabsOld = 0
 lastLineFirstChar = ""
+lastLineFirstTwoChars = ""
 bulletIndentLevel = 0
 bulletIndentation = ""
+continueEnumerate = ""
 
 footSkip = ""
 if float(args.margin) <= 0.75:
@@ -47,7 +50,7 @@ if float(args.margin) <= 0.75:
 addToPreamble = ""
 linespace = ""
 if args.draft==True:
-    addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n"
+    addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n\setlist[enumerate]{noitemsep, topsep=0pt}\n"
     linespace = "\doublespacing\n"
 preamble = "\documentclass{report}\n\
 \usepackage{outline}\n\
@@ -83,9 +86,13 @@ try:
                     headlineIndentLast -= 1
                     indentation = "\t" * headlineIndentLast
                     output += indentation + "\end{outline}\n"
+
+                if lastLineFirstTwoChars == "TK":  # check to see if need to close "TK" enumerate
+                    output += "\end{enumerate}\n"
                 output += "\\vspace{1em}\n"
                 destination.write(output)
                 continue
+
         words = line.split()
         firstString = words[0]
 
@@ -152,11 +159,23 @@ try:
             leadingTabsOld = leadingTabs
             lastLineFirstChar = firstString[0]
 
+        # case for "TK"s
+        elif re.match('TK\d+',firstString):
+            if lastLineFirstTwoChars != 'TK':
+                output = "\\begin{enumerate}%s\n" % continueEnumerate +\
+                         "\t\item[\\textsuperscript{%s}\\textbar]{\small " % firstString + " ".join(words[1:]) +\
+                         "}\n"
+            else:
+                output = "\t\item[\\textsuperscript{%s}\\textbar] {\small " % firstString +\
+                         " ".join(words[1:]) + "}\n"
+            continueEnumerate = "[resume]"
+            
         # leading backslashes cause text to be flush left
         elif firstString[0] == '\\':
             if lastLineFirstChar == "":
                 output = " ".join(words) + "\n"
-            else: output = "\\\\" + " ".join(words) + "\n"
+            else:
+                output = "\\\\" + " ".join(words) + "\n"
 
         # case for any text other than that beginning with a '*', '-', or '\'
         else:
@@ -165,6 +184,7 @@ try:
             else:
                 output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
 
+        lastLineFirstTwoChars = firstString[0:2]
         destination.write(output)
 
     # \end any hanging outline or itemize
