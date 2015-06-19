@@ -26,7 +26,7 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
-while getopts ":m:u:hd" opt; do
+while getopts ":m:u:hdn1:2:3:4:" opt; do
     case $opt in
         d)
             draft="--draft $OPTARG" >&2
@@ -36,6 +36,21 @@ while getopts ":m:u:hd" opt; do
             ;;
         u)
             unit="--unit $OPTARG" >&2
+            ;;
+        n)
+            nonuniform="--nonuniform $OPTARG" >&2
+            ;;
+        1)
+            lmargin="--lmargin $OPTARG" >&2
+            ;;
+        2)
+            tmargin="--tmargin $OPTARG" >&2
+            ;;
+        3)
+            rmargin="--rmargin $OPTARG" >&2
+            ;;
+        4)
+            bmargin="--bmargin $OPTARG" >&2
             ;;
         h)
             python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py -h
@@ -57,10 +72,10 @@ shift $(( OPTIND-1 ))
 inputFile=$1
 outputFile=${inputFile//org/tex}
 pdfFile=${inputFile//org/pdf}
-echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${draft} ${margin} ${unit} ${1}"'"
+echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${draft} ${margin} ${unit} ${nonuniform} ${lmargin} ${tmargin} ${rmargin} ${bmargin} ${1}"'"
 #echo 'Input file:' ${1}
 
-python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $draft $margin $unit $1
+python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $draft $margin $unit $nonuniform $lmargin $tmargin $rmargin $bmargin $1
 
 echo 'Escaping special TeX characters...'
 

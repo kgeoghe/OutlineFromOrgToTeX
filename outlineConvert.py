@@ -3,13 +3,24 @@ import re
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('filename', help='type the filename on which to operate')
-parser.add_argument('-d', '--draft', action='store_true', help='flag to produce printable \
-draft instead of outline')
+parser.add_argument('filename',\
+                    help='type the filename on which to operate')
+parser.add_argument('-d', '--draft', action='store_true',\
+                    help='produce roomy draft instead of tightly spaced document')
 parser.add_argument('-m', '--margin', nargs='?', default='1',\
-                    help='uniform margin width, in inches, to use in final PDF document; default is 1')
+                    help='uniform margin width to use in final PDF document; default is 1')
 parser.add_argument('-u', '--unit', nargs='?', default='in',\
                     help='margin width units; default is in (inches)')
+parser.add_argument('-n', '--nonuniform', action='store_true',\
+                    help='specify individual (nonuniform) margin widths')
+parser.add_argument('-1', '--lmargin', nargs='?', default='1.5',\
+                    help="left margin, if using '-n' flag; default is 1.5")
+parser.add_argument('-2', '--tmargin', nargs='?', default='1',\
+                    help="top margin, if using '-n' flag; default is 1")
+parser.add_argument('-3', '--rmargin', nargs='?', default='1.5',\
+                    help="right margin, if using '-n' flag; default is 1.5")
+parser.add_argument('-4', '--bmargin', nargs='?', default='1',\
+                    help="bottom margin, if using '-n' flag; default is 1")
 args = parser.parse_args()
 
 basename = args.filename[:-4]
@@ -49,25 +60,28 @@ if float(args.margin) <= 0.75:
     footSkip = ",footskip=12pt"
 addToPreamble = ""
 linespace = ""
+geometry = "\usepackage[letterpaper,margin=%s%s%s,hmarginratio=1:1]{geometry}" % (args.margin,args.unit,footSkip)
+if args.nonuniform==True:
+        geometry = "\usepackage[letterpaper,left=%s%s,top=%s%s,right=%s%s,bottom=%s%s%s,asymmetric]{geometry}" % (args.lmargin,args.unit,args.tmargin,args.unit,args.rmargin,args.unit,args.bmargin,args.unit,footSkip)
 if args.draft==True:
     addToPreamble += "\setlist[itemize]{noitemsep, topsep=0pt}\n\setlist[enumerate]{noitemsep, topsep=0pt}\n\def\\textvcenter\n\t{\hbox \\bgroup$\everyvbox{\everyvbox{}%\n\t\\aftergroup$\\aftergroup\egroup}\\vcenter}\n"
     linespace = "\doublespacing\n"
-preamble = "\documentclass{report}\n\
+preamble = "\documentclass[twoside]{report}\n\
 \usepackage{outline}\n\
-\usepackage[letterpaper,margin=%s%s%s]{geometry}\n\
+%s\n\
 \usepackage[mmddyy]{datetime}\n\
 \usepackage{setspace}\n\
 \usepackage{enumitem}\n\
 \\renewcommand{\dateseparator}{--}\n\
 \usepackage{fancyhdr}\n\
 \\renewcommand{\headrulewidth}{0pt}\n\
-\lfoot{Rev. \\today}\n\
-\cfoot{}\n\
-\\rfoot{\\thepage}\n\
+\\fancyfoot{}\n\
+\\fancyfoot[LO,RE]{Rev. \\today}\n\
+\\fancyfoot[LE,RO]{\\thepage}\n\
 \pagestyle{fancy}\n%s\
 \\begin{document}\n\
 \\noindent\n\
-%s" % (args.margin,args.unit,footSkip,addToPreamble,linespace)
+%s" % (geometry,addToPreamble,linespace)
 
 try:
     destination.write(preamble)
