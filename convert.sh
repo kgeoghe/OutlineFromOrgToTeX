@@ -26,10 +26,13 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
-while getopts ":m:u:hdn1:2:3:4:" opt; do
+while getopts ":m:u:hdbn1:2:3:4:" opt; do
     case $opt in
         d)
             draft="--draft $OPTARG" >&2
+            ;;
+        b)
+            bib="--bib $OPTARG" >&2
             ;;
         m)
             margin="--margin $OPTARG" >&2
@@ -72,10 +75,10 @@ shift $(( OPTIND-1 ))
 inputFile=$1
 outputFile=${inputFile//org/tex}
 pdfFile=${inputFile//org/pdf}
-echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${draft} ${margin} ${unit} ${nonuniform} ${lmargin} ${tmargin} ${rmargin} ${bmargin} ${1}"'"
+echo "Running command 'python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py" ${draft} ${bib} ${margin} ${unit} ${nonuniform} ${lmargin} ${tmargin} ${rmargin} ${bmargin} ${1}"'"
 #echo 'Input file:' ${1}
 
-python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $draft $margin $unit $nonuniform $lmargin $tmargin $rmargin $bmargin $1
+python ~/Repos/OutlineFromOrgToTeX/outlineConvert.py $draft $bib $margin $unit $nonuniform $lmargin $tmargin $rmargin $bmargin $1
 
 echo 'Escaping special TeX characters...'
 
@@ -87,6 +90,7 @@ s/\([^\$]\)>/\1$>$/g
 s/<=/$&$/g
 s/\([^\$]\)</\1$<$/g
 s/_/\\_/g
+s/\\_article\\_store/_article_store/
 s/\([^\\tiny{]\)TK\([0-9]*\)/\1\\textsuperscript{\\tiny{TK\2}}/g' $outputFile > text.out
 
 cp text.out $outputFile

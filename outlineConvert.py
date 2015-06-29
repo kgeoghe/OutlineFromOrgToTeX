@@ -7,6 +7,8 @@ parser.add_argument('filename',\
                     help='type the filename on which to operate')
 parser.add_argument('-d', '--draft', action='store_true',\
                     help='produce roomy draft instead of tightly spaced document')
+parser.add_argument('-b', '--bib', action='store_true',\
+                    help='includes citations')
 parser.add_argument('-m', '--margin', nargs='?', default='1',\
                     help='uniform margin width to use in final PDF document; default is 1')
 parser.add_argument('-u', '--unit', nargs='?', default='in',\
@@ -52,6 +54,7 @@ leadingTabsOld = 0
 lastLineFirstChar = ""
 lastLineFirstTwoChars = ""
 bulletIndentLevel = 0
+leadingTabsOld = -1
 bulletIndentation = ""
 continueEnumerate = ""
 
@@ -73,6 +76,7 @@ preamble = "\documentclass[twoside]{report}\n\
 \usepackage{setspace}\n\
 \usepackage{enumitem}\n\
 \\renewcommand{\dateseparator}{--}\n\
+\usepackage{natbib}\n\
 \usepackage{fancyhdr}\n\
 \\renewcommand{\headrulewidth}{0pt}\n\
 \\fancyfoot{}\n\
@@ -83,6 +87,13 @@ preamble = "\documentclass[twoside]{report}\n\
 \\noindent\n\
 %s" % (geometry,addToPreamble,linespace)
 
+bibData = ""
+if args.bib==True:
+    bibData = "\\renewcommand{\\bibname}{References}\n\
+\\bibliographystyle{plainnatmod}   %this references the modified .bst file in the local directory \n\
+\singlespace\n\
+\\bibliography{/Users/kgeoghe/Dropbox/article-store/_article_store}\n"
+
 try:
     destination.write(preamble)
 
@@ -92,7 +103,7 @@ try:
             if lastLineFirstChar == "":           # purely skip lines in file header
                 continue
             else:                                              # retain line skips I have in source file
-                while leadingTabsOld > -1:  # escape out of all outline/itemize envs. if linebreak
+                while leadingTabsOld > -1:   # escape out of all outline/itemize envs. if linebreak
                     bulletIndentation = "\t" * leadingTabsOld
                     output += indentation + bulletIndentation + "\end{itemize}\n"
                     leadingTabsOld -= 1
@@ -198,11 +209,14 @@ try:
             else:
                 output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
 
+        lastLineFirstChar = firstString[0]
         lastLineFirstTwoChars = firstString[0:2]
         destination.write(output)
 
     # \end any hanging outline or itemize
     output = ""
+    if lastLineFirstTwoChars == "TK":
+        output += "\end{enumerate}\n"
     while leadingTabsOld > -1:
         bulletIndentation = "\t" * leadingTabsOld
         output += indentation + bulletIndentation + "\end{itemize}\n"
@@ -212,7 +226,7 @@ try:
         indentation = "\t" * headlineIndentLast
         output += indentation + "\end{outline}\n"
 
-    output += "\end{document}"
+    output += bibData + "\end{document}"
     destination.write(output)
 
 finally:
