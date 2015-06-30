@@ -116,8 +116,8 @@ try:
                     output += "\end{enumerate}\n"
                 output += "\\vspace{1em}\n"
                 destination.write(output)
-                lastLineFirstChar = ""
-                lastLineFirstTwoChars = ""
+                lastLineFirstChar = "\n"
+                lastLineFirstTwoChars = "\n"
                 continue
 
         words = line.split()
