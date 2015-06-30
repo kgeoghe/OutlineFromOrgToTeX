@@ -89,7 +89,8 @@ s/>=/$&$/g
 s/\([^\$]\)>/\1$>$/g
 s/<=/$&$/g
 s/\([^\$]\)</\1$<$/g
-s/_/\\_/g
+s/\([^everyvbox{}]\)%/\1\\%/g
+s/_/\\&/g
 s/\\_article\\_store/_article_store/
 s/\([^\\tiny{]\)TK\([0-9]*\)/\1\\textsuperscript{\\tiny{TK\2}}/g' $outputFile > text.out
 
@@ -101,3 +102,4 @@ latexmk -quiet $outputFile
 latexmk -c
 
 echo "\n'"$pdfFile"' successfully generated!"
+
