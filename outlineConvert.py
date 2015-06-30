@@ -116,6 +116,8 @@ try:
                     output += "\end{enumerate}\n"
                 output += "\\vspace{1em}\n"
                 destination.write(output)
+                lastLineFirstChar = ""
+                lastLineFirstTwoChars = ""
                 continue
 
         words = line.split()
@@ -185,7 +187,7 @@ try:
             lastLineFirstChar = firstString[0]
 
         # case for "TK"s
-        elif re.match('TK\d+',firstString):
+        elif re.match('TK',firstString):
             if lastLineFirstTwoChars != 'TK':
                 output = "\\begin{enumerate}%s\n" % continueEnumerate +\
                          "\t\item[\\textvcenter{\hbox{\\tiny{%s}}}]{\small " % firstString +\
@@ -197,17 +199,21 @@ try:
             
         # leading backslashes cause text to be flush left
         elif firstString[0] == '\\':
+            if lastLineFirstTwoChars == "TK":  # check to see if need to close "TK" enumerate
+                output += "\end{enumerate}\n"
             if lastLineFirstChar == "":
-                output = " ".join(words) + "\n"
+                output += " ".join(words) + "\n"
             else:
-                output = "\\\\" + " ".join(words) + "\n"
+                output += "\\\\" + " ".join(words) + "\n"
 
         # case for any text other than that beginning with a '*', '-', or '\'
         else:
+            if lastLineFirstTwoChars == "TK":  # check to see if need to close "TK" enumerate
+                output += "\end{enumerate}\n"
             if lastLineFirstChar == "":
-                output = " ".join(words) + "\n"
+                output += " ".join(words) + "\n"
             else:
-                output = "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
+                output += "\\\\" + indentation + bulletIndentation + " ".join(words) + "\n"
 
         lastLineFirstChar = firstString[0]
         lastLineFirstTwoChars = firstString[0:2]
